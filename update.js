@@ -154,10 +154,11 @@ function sshAvailable() {
 
     return out.includes("successfully authenticated");
   } catch (err) {
-    if (err.stdout && err.stdout.toString().includes("successfully authenticated")) {
-      return true;
-    }
-    return false;
+    const output =
+      (err.stdout ? err.stdout.toString() : "") +
+      (err.stderr ? err.stderr.toString() : "");
+
+    return output.includes("successfully authenticated");
   }
 }
 
