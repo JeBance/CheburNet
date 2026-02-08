@@ -205,7 +205,7 @@ async function main() {
   writeOutput(filtered);
 
   log("Committing changes...");
-//  gitCommit();
+  gitCommit();
 
   log("Done.");
 }
