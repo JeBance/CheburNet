@@ -11,13 +11,16 @@
 
 Готовый файл доступен по ссылке:
 
-**https://raw.githubusercontent.com/JeBance/CheburNet/main/cheburnet.txt**
+**https://raw.githubusercontent.com/JeBance/CheburNet/refs/heads/gh-pages/cheburnet.txt**
 
 ---
 
 ## 📱 QR‑код для быстрого доступа
 
-![QR-code](qr-code.png)
+<p align="center">
+	<img src="qr-code.png" width="240">
+</p>
+
 
 ---
 
