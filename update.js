@@ -86,11 +86,32 @@ function writeOutput(content) {
   fs.writeFileSync(OUTPUT_FILE, content, "utf8");
 }
 
-// Check if file content changed
+// Check if file content changed (set-based comparison)
 function hasChanged(newContent) {
   if (!fs.existsSync(OUTPUT_FILE)) return true;
-  const old = fs.readFileSync(OUTPUT_FILE, "utf8");
-  return old.trim() !== newContent.trim();
+
+  const oldLines = fs.readFileSync(OUTPUT_FILE, "utf8")
+    .split("\n")
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+
+  const newLines = newContent
+    .split("\n")
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+
+  if (oldLines.length !== newLines.length) return true;
+
+  const oldSet = new Set(oldLines);
+  const newSet = new Set(newLines);
+
+  if (oldSet.size !== newSet.size) return true;
+
+  for (const line of newSet) {
+    if (!oldSet.has(line)) return true;
+  }
+
+  return false;
 }
 
 // Check if inside a git repo
@@ -131,10 +152,8 @@ function sshAvailable() {
       { encoding: "utf8" }
     );
 
-    // If stdout contains success message — SSH works
     return out.includes("successfully authenticated");
   } catch (err) {
-    // GitHub often returns exit code 1 but still prints success message
     if (err.stdout && err.stdout.toString().includes("successfully authenticated")) {
       return true;
     }
@@ -226,7 +245,7 @@ async function safeMain() {
         log("Watchdog: main() timeout, restarting...");
         resolve();
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000);
 
     main()
       .catch((err) => log("Fatal error: " + err.message))
