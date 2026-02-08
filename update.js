@@ -1,7 +1,7 @@
 /*
 Module: VLESS RU Filter Updater
-Description: Downloads parent VLESS list, filters RU servers, validates entries, writes cheburnet.txt, logs actions, auto-inits git repo, checks SSH key, commits and pushes changes
-Run: node update.js
+Description: Downloads parent VLESS list, filters RU servers, validates entries, writes cheburnet.txt, logs actions, auto-inits git repo, checks SSH key, commits and pushes changes. Supports single-run and daemon mode with jitter and watchdog.
+Run: node update.js [--daemon]
 File: update.js
 */
 
@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 const PARENT_URL = "https://raw.githubusercontent.com/zieng2/wl/main/vless_lite.txt";
 const OUTPUT_FILE = path.join(__dirname, "cheburnet.txt");
 const LOG_FILE = path.join(__dirname, "update.log");
-const AUTO_INIT = true; // auto-create git repo if missing
+const AUTO_INIT = true;
 
 // Log function
 function log(msg) {
@@ -28,7 +28,7 @@ function log(msg) {
   console.log(msg);
 }
 
-// Download function with fallback
+// Download function
 function download(url) {
   return new Promise((resolve, reject) => {
     https
@@ -53,14 +53,12 @@ function isValidVless(line) {
   if (!line.includes("#")) return false;
 
   const [urlPart] = line.split("#");
-
-  // URL part must not contain spaces
   if (urlPart.includes(" ")) return false;
 
   return true;
 }
 
-// Detect RU-tag (emoji or URL-encoded 🇷🇺)
+// Detect RU-tag
 function isRussianTagged(line) {
   return (
     line.includes("🇷🇺") ||
@@ -79,7 +77,8 @@ function filterRussian(list) {
     .filter(isRussianTagged)
     .filter(isValidVless);
 
-  return filtered.join("\n");
+  // Remove duplicates
+  return Array.from(new Set(filtered)).join("\n");
 }
 
 // Write output file
@@ -167,7 +166,7 @@ function gitCommit() {
   }
 }
 
-// Main
+// Main logic
 async function main() {
   log("Downloading parent list...");
 
@@ -210,7 +209,48 @@ async function main() {
   log("Done.");
 }
 
-main().catch((err) => {
-  log("Fatal error: " + err.message);
-});
+// Watchdog wrapper
+async function safeMain() {
+  return new Promise((resolve) => {
+    let finished = false;
+
+    const timeout = setTimeout(() => {
+      if (!finished) {
+        log("Watchdog: main() timeout, restarting...");
+        resolve();
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    main()
+      .catch((err) => log("Fatal error: " + err.message))
+      .finally(() => {
+        finished = true;
+        clearTimeout(timeout);
+        resolve();
+      });
+  });
+}
+
+// Daemon mode
+async function daemon() {
+  while (true) {
+    await safeMain();
+
+    const jitter = Math.floor(Math.random() * 10 * 60 * 1000) - 5 * 60 * 1000;
+    const sleepTime = 24 * 60 * 60 * 1000 + jitter;
+
+    log("Sleeping for " + Math.round(sleepTime / 60000) + " minutes...");
+    await new Promise((resolve) => setTimeout(resolve, sleepTime));
+  }
+}
+
+// Entry point
+const args = process.argv.slice(2);
+
+if (args.includes("--daemon")) {
+  log("Starting in daemon mode...");
+  daemon();
+} else {
+  safeMain();
+}
 
