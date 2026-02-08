@@ -123,14 +123,21 @@ function gitInit() {
   log("Git repository initialized.");
 }
 
-// Check SSH key availability
+// Check SSH key availability (GitHub returns exit code 1 even on success)
 function sshAvailable() {
   try {
-    execSync("ssh -T -o BatchMode=yes git@github.com-jebance", {
-      stdio: "ignore",
-    });
-    return true;
-  } catch {
+    const out = execSync(
+      "ssh -T -o BatchMode=yes git@github.com-jebance",
+      { encoding: "utf8" }
+    );
+
+    // If stdout contains success message — SSH works
+    return out.includes("successfully authenticated");
+  } catch (err) {
+    // GitHub often returns exit code 1 but still prints success message
+    if (err.stdout && err.stdout.toString().includes("successfully authenticated")) {
+      return true;
+    }
     return false;
   }
 }
