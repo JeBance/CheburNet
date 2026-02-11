@@ -264,7 +264,7 @@ async function daemon() {
     await safeMain();
 
     const jitter = Math.floor(Math.random() * 10 * 60 * 1000) - 5 * 60 * 1000;
-    const sleepTime = 24 * 60 * 60 * 1000 + jitter;
+    const sleepTime = 1 * 60 * 60 * 1000 + jitter;
 
     log("Sleeping for " + Math.round(sleepTime / 60000) + " minutes...");
     await new Promise((resolve) => setTimeout(resolve, sleepTime));
