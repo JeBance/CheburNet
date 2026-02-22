@@ -162,30 +162,51 @@ function sshAvailable() {
   }
 }
 
-// Auto-commit
+// Обновлённая функция gitCommit
 function gitCommit() {
   if (!gitExists()) {
     log("Git not found. Skipping commit.");
     return;
   }
 
-  if (!isGitRepo()) {
-    log("Not a git repository.");
-    gitInit();
-    if (!isGitRepo()) return;
+  // --- НАСТРОЙКА ПОЛЬЗОВАТЕЛЯ (ваши данные) ---
+  try {
+    execSync('git config user.name "JeBance"');
+    execSync('git config user.email "oleg.prudkov@gmail.com"');
+  } catch (e) {
+    log("Failed to set git user");
   }
+  // -------------------------------------------
 
-  if (!sshAvailable()) {
-    log("SSH key not available. Skipping push.");
-    return;
+  // Проверяем, запущены ли мы в GitHub Actions
+  const isGitHubActions = !!process.env.GITHUB_ACTIONS;
+  const token = process.env.GITHUB_TOKEN;
+
+  if (isGitHubActions && token) {
+    // Меняем remote URL, чтобы использовать токен для пуша
+    const repoUrl = `https://x-access-token:${token}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+    try {
+      execSync(`git remote set-url origin ${repoUrl}`);
+    } catch (e) {
+      log("Failed to set remote URL with token");
+    }
+  } else {
+    // В обычной среде проверяем SSH
+    if (!sshAvailable()) {
+      log("SSH key not available. Skipping push.");
+      return;
+    }
   }
 
   try {
     const fileName = path.basename(OUTPUT_FILE);
     execSync(`git add ${fileName}`);
-    execSync(
-      'git commit -m "chore: update cheburnet.txt (RU-only VLESS list sync)"'
-    );
+
+    // --- ЯВНО УКАЗЫВАЕМ АВТОРА КОММИТА ---
+    const author = "JeBance <oleg.prudkov@gmail.com>";
+    execSync(`git commit --author="${author}" -m "chore: update cheburnet.txt (RU-only VLESS list sync)"`);
+    // ---------------------------------------
+
     execSync("git push");
     log("Git commit pushed.");
   } catch {
@@ -264,7 +285,7 @@ async function daemon() {
     await safeMain();
 
     const jitter = Math.floor(Math.random() * 10 * 60 * 1000) - 5 * 60 * 1000;
-    const sleepTime = 1 * 60 * 60 * 1000 + jitter;
+    const sleepTime = 24 * 60 * 60 * 1000 + jitter;
 
     log("Sleeping for " + Math.round(sleepTime / 60000) + " minutes...");
     await new Promise((resolve) => setTimeout(resolve, sleepTime));
@@ -280,4 +301,3 @@ if (args.includes("--daemon")) {
 } else {
   safeMain();
 }
-

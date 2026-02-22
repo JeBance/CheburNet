@@ -1,0 +1,31 @@
+name: Update cheburnet.txt
+
+on:
+  schedule:
+    # Запуск каждый час (в 0 минут)
+    - cron: '0 * * * *'
+  workflow_dispatch:   # позволяет запускать вручную
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run update script
+        run: node update.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # автоматически предоставляется
+
+      - name: Upload log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: update-log
+          path: update.log
