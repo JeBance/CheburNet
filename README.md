@@ -11,7 +11,7 @@
 
 Готовый файл доступен по ссылке:
 
-**https://raw.githubusercontent.com/JeBance/CheburNet/gh-pages/cheburnet.txt**
+**https://raw.githubusercontent.com/JeBance/CheburNet/gh-pages/cheburnet.txt#CheburNet%20-%20Russian%20VLESS%20list**
 
 ---
 
