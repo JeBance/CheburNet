@@ -1,4 +1,4 @@
 vless://6d60c73d-5915-4cf8-b155-e522dfd863bb@31.128.37.67:16560?encryption=none&security=none&type=raw#%F0%9F%87%B7%F0%9F%87%BA%20Beget%20%E2%80%94%20%231
-vless://2aa7f4b1-e859-46d0-b8ac-8587811ab7b1@212.67.9.113:2200?encryption=none&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20MegaMax%20Network%20%E2%80%94%20%232
-vless://f0528a17-863f-4160-a5a0-0d9ad03f2ee7@201.24.49.74:2200?encryption=none&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20Timeweb%20%E2%80%94%20%233
-vless://84d0ff7b-9760-415f-a974-b3e1fe92264f@194.26.229.122:2200?encryption=none&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20Xorek.Cloud%20%E2%80%94%20%234
+vless://2e79f3ca-b8db-4d4d-a96e-8f7313480696@168.222.203.14:4100?encryption=none&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20SpaceWeb%20%E2%80%94%20%232
+vless://39e0f41b-180b-4f7e-a607-37b135f0fd83@200.165.234.45:4100?encryption=none&host=live.ok.ru&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20Timeweb%20%E2%80%94%20%233
+vless://f0528a17-863f-4160-a5a0-0d9ad03f2ee7@201.24.49.74:2200?encryption=none&path=%2Fv1&security=none&type=ws#%F0%9F%87%B7%F0%9F%87%BA%20Timeweb%20%E2%80%94%20%234
